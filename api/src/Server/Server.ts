@@ -1,6 +1,8 @@
 import express, { Request, Response } from "express"
 import cors from "cors"
 import morgan from "morgan"
+import UserRoutes from "../routes/User.routes"
+import IdentityCardRoutes from "../routes/IdentityCard.routes"
 
 export default class Server {
 
@@ -17,9 +19,9 @@ export default class Server {
             .use(cors())
             .use(morgan("dev"))
             .use(express.urlencoded())
-            .get("/", (req: Request, res: Response) => {
-                res.status(200).json("ok")
-            })
+            .use("/user", new UserRoutes().userRoutes)
+            .use("/identityCard", new IdentityCardRoutes().identityCardRoutes)
+
     }
 
 
