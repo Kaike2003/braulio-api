@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @unique @default(uuid())
+  username  String
+  email     String
+  create_at DateTime @default(now())
+  update_at DateTime @updatedAt()
+
+  @@map("users")
+}
+
+model Phones {
+  id     String @unique @default(uuid())
+  phone1 Int
+  phone2 Int
+  phone3 Int?
+  phone4 Int?
+  phone5 Int?
+}
+
+model IdentityCard {
+  id String @unique 
+}
