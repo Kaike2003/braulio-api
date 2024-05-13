@@ -8,24 +8,80 @@ datasource db {
 }
 
 model User {
-  id        String   @unique @default(uuid())
-  username  String
-  email     String
-  create_at DateTime @default(now())
-  update_at DateTime @updatedAt()
+  id           String         @unique @default(uuid())
+  username     String
+  email        String
+  create_at    DateTime       @default(now())
+  update_at    DateTime       @updatedAt()
+  Phone        Phone[]
+  Fingerprint  Fingerprint[]
+  IdentityCard IdentityCard[]
 
   @@map("users")
 }
 
-model Phones {
+model Phone {
   id     String @unique @default(uuid())
   phone1 Int
   phone2 Int
   phone3 Int?
   phone4 Int?
   phone5 Int?
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  create_at DateTime @default(now())
+  update_at DateTime @updatedAt()
+
+  @@map("phones")
 }
 
 model IdentityCard {
-  id String @unique 
+  id            String        @unique @default(uuid())
+  name          String
+  fathername    String
+  mathename     String
+  mothename     String
+  residence     String
+  naturalfrom   String
+  province      String
+  datebirth     DateTime
+  sexo          Sexo
+  height        Int
+  maritalstatus MaritalStatus
+  issuedon      DateTime
+  validuntil    DateTime
+  user          User          @relation(fields: [userId], references: [id])
+  userId        String
+
+  create_at DateTime @default(now())
+  update_at DateTime @updatedAt()
+
+  @@map("identityCards")
+}
+
+model Fingerprint {
+  id String @unique
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  create_at DateTime @default(now())
+  update_at DateTime @updatedAt()
+
+  @@map("fingerprints")
+}
+
+enum Sexo {
+  masculine
+  feminino
+}
+
+enum MaritalStatus {
+  single
+  married
+  widower
+  divorced
+  separate
 }
