@@ -14,10 +14,10 @@ export default class UserRoutes extends UserController {
     private allUserRoutes() {
         this.userRoutes
             .post("/", super.create)
+            .post("/login", super.login)
             .patch("/:id", super.updateBasic)
             .patch("/email/:id", super.updateEmail)
             .patch("/phone/:id/:idPhone", super.updatePhone)
-
     }
 
 

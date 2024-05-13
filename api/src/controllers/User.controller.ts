@@ -1,6 +1,8 @@
 import UserRepository from '../repository/User.repository';
 import {
-    SchemaUserCreate, TSchemaUserUpdateBasic, TSchemaUserCreate, SchemaUserUpdateBasic, SchemaUserUpdateEmail, TSchemaUserUpdateEmail, TSchemaUserPhoneUpdate, SchemaUserPhoneUpdate
+    SchemaUserCreate, TSchemaUserUpdateBasic, TSchemaUserCreate, SchemaUserUpdateBasic, SchemaUserUpdateEmail, TSchemaUserUpdateEmail, TSchemaUserPhoneUpdate, SchemaUserPhoneUpdate,
+    TSchemaUserLogin,
+    SchemaUserLogin
 } from './../validation/user.validation';
 import { Request, Response } from "express";
 
@@ -10,6 +12,23 @@ export default class UserController extends UserRepository {
 
     constructor() {
         super()
+    }
+
+    protected async login(req: Request, res: Response) {
+
+        const { email, password }: TSchemaUserLogin = req.body
+
+        SchemaUserLogin.parseAsync({
+            email: email,
+            password: password
+        })
+            .then(async success => {
+                return await super.loginUser(req, res, success)
+            })
+            .catch(async error => {
+                res.status(400).json(error)
+            })
+
     }
 
     protected async create(req: Request, res: Response) {

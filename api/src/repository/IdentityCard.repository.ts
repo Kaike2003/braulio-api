@@ -64,7 +64,7 @@ export default class IdentityCardRepository {
                                     }
                                 })
                                     .then(async success => {
-                                        res.status(201).json(success)
+                                        res.status(201).json("Bilhete criado")
                                     })
                                     .catch(async error => {
                                         res.status(400).json(error)
@@ -155,7 +155,7 @@ export default class IdentityCardRepository {
                                     }
                                 })
                                     .then(async success => {
-                                        res.status(201).json(success)
+                                        res.status(201).json("Bilhete atualizado")
                                     })
                                     .catch(async error => {
                                         res.status(400).json(error)
@@ -197,7 +197,51 @@ export default class IdentityCardRepository {
 
     protected async updateCardNumberUser(req: Request, res: Response, identity: Pick<IdentityCardDto, "id" | "cardnumber">) {
 
-        
+        const { cardnumber, id } = identity
+
+        const verifyCardNumberId = await prisma.identityCard.findUnique({
+            where: {
+                id: id
+            }
+        })
+
+        const verifyCardNumber = await prisma.identityCard.findUnique({
+            where: {
+                cardnumber: cardnumber
+            }
+        })
+
+
+        if (verifyCardNumberId?.id === id) {
+
+            if (verifyCardNumber?.cardnumber === cardnumber) {
+                res.status(400).json(`O numero de indetificacao desse bilhete ja esta sendo usado ${cardnumber}`)
+            } else {
+
+                const response = await prisma.identityCard.update({
+                    where: {
+                        id: id
+                    },
+                    data: {
+                        cardnumber: cardnumber
+                    },
+                    select: {
+                        cardnumber: true
+                    }
+                })
+                    .then(async success => {
+                        res.status(201).json("Bilhete atualizado")
+                    })
+                    .catch(async error => {
+                        res.status(400).json(error)
+                    })
+
+            }
+
+
+        } else {
+            res.status(400).json(`Id ${id} invalido`)
+        }
 
     }
 

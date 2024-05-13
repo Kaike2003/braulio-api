@@ -17,6 +17,8 @@ export default class IdentityCardRoutes extends IdentityCardController {
         this.identityCardRoutes
             .post("/", super.createIdentityCard)
             .patch("/:id", super.updateIdentityCard)
+            .patch("/cardenumber/:id", super.updateCardnumber)
+
     }
 
 

@@ -22,7 +22,8 @@ const SchemaUser = z.object({
         .max(40),
 })
 
-export const SchemaUserCreate = SchemaUser.omit({ id: true })
+
+export const SchemaUserCreate = SchemaUser.omit({ id: true, idPhone: true })
 export const SchemaUserDelete = SchemaUser.pick({ email: true })
 export const SchemaUserUpdateBasic = SchemaUser.omit({ email: true, phone1: true, phone2: true, idPhone: true })
 export const SchemaUserUpdateEmail = SchemaUser.pick({ id: true, email: true })

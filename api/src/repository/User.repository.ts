@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import UserDto from "../dto/User.dto";
 import { prisma } from "../../prisma/prisma";
 import Passowrd from "../utils/services/Password";
+import { SchemaUserLogin, TSchemaUserLogin } from "../validation/user.validation";
+import Jwt from "../utils/services/Jwt";
 
 
 export default class UserRepository extends Passowrd {
@@ -10,7 +12,36 @@ export default class UserRepository extends Passowrd {
         super()
     }
 
-    protected async createUser(req: Request, res: Response, user: Omit<UserDto, "id">) {
+    protected async loginUser(req: Request, res: Response, user: Pick<UserDto, "password" | "email">) {
+
+        const { email, password } = user
+
+        const verifyEmail = await prisma.user.findUnique({
+            where: {
+                email: email
+            }
+        })
+
+        if (verifyEmail?.email === email) {
+
+            const passwordcorrect = await super.ComparePassword(email, verifyEmail.email)
+
+            if (passwordcorrect === true) {
+
+                const logged = new Jwt().token_sign(verifyEmail.id)
+
+                res.status(200).json(logged)
+                
+            }
+
+        } else {
+            res.status(400).json(`Email ${email} invalido`)
+        }
+
+
+    }
+
+    protected async createUser(req: Request, res: Response, user: Omit<UserDto, "id" | "idPhone">) {
 
         const { email, password, username, phone1, phone2 } = user
 
