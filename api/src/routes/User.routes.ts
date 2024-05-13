@@ -1,5 +1,6 @@
 import { Router } from "express";
 import UserController from "../controllers/User.controller";
+import PermissionRoutes from "../utils/services/PermissionRoutes";
 
 
 export default class UserRoutes extends UserController {
@@ -11,14 +12,17 @@ export default class UserRoutes extends UserController {
         this.allUserRoutes()
     }
 
-    private allUserRoutes() {
+    private async allUserRoutes() {
+
+        const permission = await new PermissionRoutes().permission("user")
+
         this.userRoutes
             .post("/", super.create)
             .post("/login", super.login)
-            .patch("/:id", super.updateBasic)
-            .patch("/email/:id", super.updateEmail)
-            .patch("/phone/:id/:idPhone", super.updatePhone)
+            .patch("/:id", permission, super.updateBasic)
+            .patch("/email/:id", permission, super.updateEmail)
+            .patch("/phone/:id/:idPhone", permission, super.updatePhone)
+            .get("/", super.findAll)
     }
-
 
 }

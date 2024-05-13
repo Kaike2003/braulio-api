@@ -104,6 +104,12 @@ export default class UserController extends UserRepository {
             })
     }
 
+    protected async findAll(req: Request, res: Response) {
+
+        return await super.findAllUser(req, res)
+
+    }
+
 
 
 }

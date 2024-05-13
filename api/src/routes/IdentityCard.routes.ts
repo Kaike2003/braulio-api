@@ -1,6 +1,7 @@
 import { Router } from "express";
 import UserController from "../controllers/User.controller";
 import IdentityCardController from "../controllers/IdentityCard.controller";
+import PermissionRoutes from "../utils/services/PermissionRoutes";
 
 
 export default class IdentityCardRoutes extends IdentityCardController {
@@ -13,11 +14,14 @@ export default class IdentityCardRoutes extends IdentityCardController {
         this.allIdentityRoutes()
     }
 
-    private allIdentityRoutes() {
+    private async allIdentityRoutes() {
+
+        const permission = await new PermissionRoutes().permission("user")
+
         this.identityCardRoutes
-            .post("/", super.createIdentityCard)
-            .patch("/:id", super.updateIdentityCard)
-            .patch("/cardenumber/:id", super.updateCardnumber)
+            .post("/", permission, super.createIdentityCard)
+            .patch("/:id", permission, super.updateIdentityCard)
+            .patch("/cardenumber/:id", permission, super.updateCardnumber)
 
     }
 

@@ -24,14 +24,16 @@ export default class UserRepository extends Passowrd {
 
         if (verifyEmail?.email === email) {
 
-            const passwordcorrect = await super.ComparePassword(email, verifyEmail.email)
+            const passwordcorrect = await super.ComparePassword(password, verifyEmail.password)
 
             if (passwordcorrect === true) {
 
                 const logged = new Jwt().token_sign(verifyEmail.id)
 
                 res.status(200).json(logged)
-                
+
+            } else {
+                res.status(400).json(`A sua palavra passe está incorreta.`)
             }
 
         } else {
@@ -252,6 +254,18 @@ export default class UserRepository extends Passowrd {
     }
 
     protected async createIdentityCardUser(req: Request, res: Response, user: Pick<UserDto, 'email'>) {
+
+    }
+
+    protected async findAllUser(req: Request, res: Response) {
+
+        const response = await prisma.user.findMany({
+            select:{
+                email: true,
+                username: true
+            }
+        })
+        return res.status(200).json(response)
 
     }
 

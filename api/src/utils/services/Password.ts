@@ -14,6 +14,7 @@ export default class Passowrd {
 
     protected async ComparePassword(passwordactually: string, passwordOld: string) {
 
+
         const passwordcorrect = bcrypt.compareSync(passwordactually, passwordOld)
 
         if (!passwordcorrect) {

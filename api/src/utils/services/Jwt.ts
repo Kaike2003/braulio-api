@@ -10,7 +10,7 @@ export default class Jwt {
             id: id,
         }, segredo, { expiresIn: "3d" })
 
-        return { token, id }
+        return token
 
     }
 
