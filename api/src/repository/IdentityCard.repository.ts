@@ -18,7 +18,7 @@ export default class IdentityCardRepository {
 
         const verifyDateidentityCard = validuntil.getFullYear() - issuedon.getFullYear()
 
-        const verifyIdentityCard = await prisma.identityCard.findUnique({
+        const verifyIdentityCard = await prisma.user.findUnique({
             where: {
                 cardnumber: cardnumber
             }
