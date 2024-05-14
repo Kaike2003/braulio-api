@@ -90,7 +90,7 @@ export default class UserRepository extends Passowrd {
                             }
                         })
                             .then(async success => {
-                                res.status(201).json(success)
+                                res.status(201).json("Conta criada")
                             })
                             .catch(async error => {
                                 res.status(400).json(error)
@@ -185,7 +185,7 @@ export default class UserRepository extends Passowrd {
                 }
             })
                 .then(async success => {
-                    res.status(200).json(success)
+                    res.status(200).json("Email atualizado")
                 })
                 .catch(async error => {
                     res.status(400).json(error)
@@ -260,7 +260,7 @@ export default class UserRepository extends Passowrd {
     protected async findAllUser(req: Request, res: Response) {
 
         const response = await prisma.user.findMany({
-            select:{
+            select: {
                 email: true,
                 username: true
             }

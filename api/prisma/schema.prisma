@@ -8,15 +8,31 @@ datasource db {
 }
 
 model User {
-  id           String         @unique @default(uuid())
-  username     String
-  email        String         @unique
-  password     String
-  create_at    DateTime       @default(now())
-  update_at    DateTime       @updatedAt()
-  Phone        Phone[]
-  Fingerprint  Fingerprint[]
-  IdentityCard IdentityCard[]
+  id       String @unique @default(uuid())
+  username String
+  email    String @unique
+  password String
+
+  cardnumber    String        @unique
+  name          String
+  fathername    String
+  mathername    String
+  residence     String
+  naturalfrom   String
+  province      String
+  datebirth     DateTime
+  sexo          Sexo
+  height        Float
+  maritalstatus MaritalStatus
+  issuedon      DateTime
+  validuntil    DateTime
+
+  fingerprint String @unique
+
+  create_at DateTime @default(now())
+  update_at DateTime @updatedAt()
+
+  Phone Phone[]
 
   @@map("users")
 }
@@ -33,42 +49,6 @@ model Phone {
   update_at DateTime @updatedAt()
 
   @@map("phones")
-}
-
-model IdentityCard {
-  id            String        @unique @default(uuid())
-  name          String
-  fathername    String
-  mathername    String
-  residence     String
-  naturalfrom   String
-  province      String
-  datebirth     DateTime
-  sexo          Sexo
-  height        Float
-  maritalstatus MaritalStatus
-  issuedon      DateTime
-  validuntil    DateTime
-  cardnumber    String        @unique
-  user          User          @relation(fields: [userId], references: [id])
-  userId        String
-
-  create_at DateTime @default(now())
-  update_at DateTime @updatedAt()
-
-  @@map("identityCards")
-}
-
-model Fingerprint {
-  id String @unique
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  create_at DateTime @default(now())
-  update_at DateTime @updatedAt()
-
-  @@map("fingerprints")
 }
 
 enum Sexo {

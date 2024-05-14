@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { SchemaIdentityCardCreate, SchemaIdentityCardNumberUpdate, SchemaIdentityCardUpdate, TSchemaIdentityCardCreate, TSchemaIdentityCardNumberUpdate, TSchemaIdentityCardUpdate } from "../validation/identityCard.validation"
+import { SchemaIdentityCardCreate, SchemaIdentityCardNumberUpdate, SchemaIdentityCardUpdate, SchemaIdentityFindAll, TSchemaIdentityCardCreate, TSchemaIdentityCardNumberUpdate, TSchemaIdentityCardUpdate } from "../validation/identityCard.validation"
 import IdentityCardRepository from "../repository/IdentityCard.repository"
 
 
@@ -79,6 +79,21 @@ export default class IdentityCardController extends IdentityCardRepository {
         })
             .then(async success => {
                 return await super.updateCardNumberUser(req, res, success)
+            })
+            .catch(async error => {
+                res.status(400).json(error)
+            })
+    }
+
+    protected async getIndentity(req: Request, res: Response) {
+
+        const { email } = req.params
+
+        SchemaIdentityFindAll.parseAsync({
+            email: email
+        })
+            .then(async success => {
+                return await super.getIdentityCardeUser(req, res, success)
             })
             .catch(async error => {
                 res.status(400).json(error)

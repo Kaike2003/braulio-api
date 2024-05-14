@@ -45,8 +45,10 @@ export const SchemaIdentityCardCreate = SchemaIdentityCard.omit({ id: true, user
 export const SchemaIdentityCardUpdate = SchemaIdentityCard.omit({ userId: true, cardnumber: true })
 
 export const SchemaIdentityCardNumberUpdate = SchemaIdentityCard.pick({ cardnumber: true, id: true })
+export const SchemaIdentityFindAll = SchemaIdentityCard.pick({ email: true })
 
 export type TSchemaIdentityCardCreate = z.infer<typeof SchemaIdentityCardCreate>
 export type TSchemaIdentityCardUpdate = z.infer<typeof SchemaIdentityCardUpdate>
 export type TSchemaIdentityCardNumberUpdate = z.infer<typeof SchemaIdentityCardNumberUpdate>
+export type TSchemaIdentityFindAll = z.infer<typeof SchemaIdentityFindAll>
 

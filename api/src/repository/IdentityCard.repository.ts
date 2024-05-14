@@ -245,5 +245,38 @@ export default class IdentityCardRepository {
 
     }
 
+    protected async getIdentityCardeUser(req: Request, res: Response, identity: Pick<IdentityCardDto, "email">) {
+
+
+        const { email } = identity
+
+        const verifyUser = await prisma.user.findUnique({
+            where: {
+                email: email
+            }
+        })
+
+        if (verifyUser?.email === email) {
+
+            const response = await prisma.identityCard.findMany({
+                where: {
+                    user: {
+                        email: ""
+                    }
+                }
+            })
+                .then(async success => {
+                    res.status(200).json(success)
+                })
+                .catch(async error => {
+                    res.status(400).json(error)
+                })
+
+        }
+
+
+
+    }
+
 
 }
