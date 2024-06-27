@@ -40,7 +40,6 @@ export default class IdentityCardController extends IdentityCardRepository {
 
     protected async updateIdentityCard(req: Request, res: Response) {
 
-        const { id } = req.params
         const { datebirth, fathername, height, issuedon, maritalstatus, mathername, name, naturalfrom, province, residence, sexo, validuntil, email }: TSchemaIdentityCardUpdate = req.body
 
         SchemaIdentityCardUpdate.parseAsync({
@@ -57,7 +56,6 @@ export default class IdentityCardController extends IdentityCardRepository {
             residence: residence,
             sexo: sexo,
             validuntil: new Date(validuntil),
-            id: id
         })
             .then(async success => {
                 return await super.updateIdentityCardUser(req, res, success)

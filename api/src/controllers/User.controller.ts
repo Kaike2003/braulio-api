@@ -2,7 +2,10 @@ import UserRepository from '../repository/User.repository';
 import {
     SchemaUserCreate, TSchemaUserUpdateBasic, TSchemaUserCreate, SchemaUserUpdateBasic, SchemaUserUpdateEmail, TSchemaUserUpdateEmail, TSchemaUserPhoneUpdate, SchemaUserPhoneUpdate,
     TSchemaUserLogin,
-    SchemaUserLogin
+    SchemaUserLogin,
+    SchemaUserFindUnique,
+    SchemaPasswordUpdate,
+    TSchemaPasswordUpdate
 } from './../validation/user.validation';
 import { Request, Response } from "express";
 
@@ -52,12 +55,14 @@ export default class UserController extends UserRepository {
 
     protected async updateBasic(req: Request, res: Response) {
 
-        const { id } = req.params
-        const { password, username }: TSchemaUserUpdateBasic = req.body
+        const { email, idPhone } = req.params
+        const { username, phone1, phone2 }: TSchemaUserUpdateBasic = req.body
 
         SchemaUserUpdateBasic.parseAsync({
-            id: id,
-            password: password,
+            idPhone: idPhone,
+            email: email,
+            phone1: phone1,
+            phone2: phone2,
             username: username
         })
             .then(async success => {
@@ -73,6 +78,7 @@ export default class UserController extends UserRepository {
         const { id } = req.params
         const { email }: TSchemaUserUpdateEmail = req.body
 
+
         SchemaUserUpdateEmail.parseAsync({
             id: id,
             email: email,
@@ -85,28 +91,39 @@ export default class UserController extends UserRepository {
             })
     }
 
-    protected async updatePhone(req: Request, res: Response) {
+    protected async updatePassword(req: Request, res: Response) {
 
-        const { id, idPhone } = req.params
-        const { phone1, phone2 }: TSchemaUserPhoneUpdate = req.body
+        const { email } = req.params
+        const { oldpassword, passwordactually }: TSchemaPasswordUpdate = req.body
 
-        SchemaUserPhoneUpdate.parseAsync({
-            id: id,
-            phone1: phone1,
-            phone2: phone2,
-            idPhone: idPhone
+
+        SchemaPasswordUpdate.parseAsync({
+            email: email,
+            oldpassword: oldpassword,
+            passwordactually: passwordactually
         })
             .then(async success => {
-                return await super.updatePhoneUser(req, res, success)
+                return await super.UpdatePasswordUser(req, res, success)
             })
             .catch(async error => {
                 res.status(400).json(error)
             })
     }
 
-    protected async findAll(req: Request, res: Response) {
+    protected async findUnique(req: Request, res: Response) {
 
-        return await super.findAllUser(req, res)
+        const { email } = req.params
+
+        SchemaUserFindUnique.parseAsync({
+            email
+        })
+            .then(async success => {
+                return await super.findUniqueUser(req, res, success)
+            })
+            .catch(async error => {
+                res.status(400).json(error)
+            })
+
 
     }
 

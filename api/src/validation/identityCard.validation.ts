@@ -42,7 +42,7 @@ const SchemaIdentityCard = z.object({
 })
 
 export const SchemaIdentityCardCreate = SchemaIdentityCard.omit({ id: true, userId: true })
-export const SchemaIdentityCardUpdate = SchemaIdentityCard.omit({ userId: true, cardnumber: true })
+export const SchemaIdentityCardUpdate = SchemaIdentityCard.omit({ userId: true, cardnumber: true ,id: true })
 
 export const SchemaIdentityCardNumberUpdate = SchemaIdentityCard.pick({ cardnumber: true, id: true })
 export const SchemaIdentityFindAll = SchemaIdentityCard.pick({ email: true })

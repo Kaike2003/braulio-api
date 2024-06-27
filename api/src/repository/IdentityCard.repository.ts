@@ -45,7 +45,10 @@ export default class IdentityCardRepository {
 
                             if (sexo_status.masculine === sexo || sexo_status.feminino === sexo) {
 
-                                const response = await prisma.identityCard.create({
+                                const response = await prisma.user.update({
+                                    where: {
+                                        email: String(email)
+                                    },
                                     data: {
                                         cardnumber: cardnumber,
                                         datebirth: datebirth,
@@ -58,9 +61,9 @@ export default class IdentityCardRepository {
                                         naturalfrom: naturalfrom,
                                         province: province,
                                         residence: residence,
-                                        userId: verifyUser.id,
                                         validuntil: validuntil,
-                                        sexo: sexo
+                                        sexo: sexo,
+                                        created: true
                                     }
                                 })
                                     .then(async success => {
@@ -99,20 +102,15 @@ export default class IdentityCardRepository {
 
     }
 
-    protected async updateIdentityCardUser(req: Request, res: Response, identity: Omit<IdentityCardDto, "userId" | "cardnumber">) {
+    protected async updateIdentityCardUser(req: Request, res: Response, identity: Omit<IdentityCardDto, "userId" | "cardnumber" | "id">) {
 
-        const { datebirth, email, fathername, height, issuedon, maritalstatus, mathername, name, naturalfrom, province, residence, sexo, validuntil, id } = identity
+        const { datebirth, email, fathername, height, issuedon, maritalstatus, mathername, name, naturalfrom, province, residence, sexo, validuntil } = identity
 
         const status = MaritalStatus
         const sexo_status = Sexo
 
         const verifyDateidentityCard = validuntil.getFullYear() - issuedon.getFullYear()
 
-        const verifyIdentityCardId = await prisma.identityCard.findUnique({
-            where: {
-                id: id
-            }
-        })
 
         const verifyUser = await prisma.user.findUnique({
             where: {
@@ -121,76 +119,65 @@ export default class IdentityCardRepository {
         })
 
 
-        if (verifyIdentityCardId?.id === id) {
 
-            if (verifyUser?.email === email) {
+        if (verifyUser?.email === email) {
 
-                if (issuedon < validuntil) {
+            if (issuedon < validuntil) {
 
-                    if (verifyDateidentityCard >= 5) {
+                if (verifyDateidentityCard >= 5) {
 
-                        if (status.divorced === maritalstatus || status.married === maritalstatus || status.separate === maritalstatus || status.single === maritalstatus || status.widower === maritalstatus) {
+                    if (status.divorced === maritalstatus || status.married === maritalstatus || status.separate === maritalstatus || status.single === maritalstatus || status.widower === maritalstatus) {
 
 
-                            if (sexo_status.masculine === sexo || sexo_status.feminino === sexo) {
+                        if (sexo_status.masculine === sexo || sexo_status.feminino === sexo) {
 
-                                const response = await prisma.identityCard.update({
-                                    where: {
-                                        id: id
-                                    },
-                                    data: {
-                                        datebirth: datebirth,
-                                        fathername: fathername,
-                                        height: height,
-                                        issuedon: issuedon,
-                                        maritalstatus: maritalstatus,
-                                        mathername: mathername,
-                                        name: name,
-                                        naturalfrom: naturalfrom,
-                                        province: province,
-                                        residence: residence,
-                                        userId: verifyUser.id,
-                                        validuntil: validuntil,
-                                        sexo: sexo
-                                    }
+                            const response = await prisma.user.update({
+                                where: {
+                                    email: email
+                                },
+                                data: {
+                                    datebirth: datebirth,
+                                    fathername: fathername,
+                                    height: height,
+                                    issuedon: issuedon,
+                                    maritalstatus: maritalstatus,
+                                    mathername: mathername,
+                                    name: name,
+                                    naturalfrom: naturalfrom,
+                                    province: province,
+                                    residence: residence,
+                                    validuntil: validuntil,
+                                    sexo: sexo
+                                }
+                            })
+                                .then(async success => {
+                                    res.status(201).json("Bilhete atualizado")
                                 })
-                                    .then(async success => {
-                                        res.status(201).json("Bilhete atualizado")
-                                    })
-                                    .catch(async error => {
-                                        res.status(400).json(error)
-                                    })
-
-
-                            } else {
-                                res.status(400).json(`Estado civil invalido ${maritalstatus}`)
-                            }
+                                .catch(async error => {
+                                    res.status(400).json(error)
+                                })
 
 
                         } else {
                             res.status(400).json(`Estado civil invalido ${maritalstatus}`)
                         }
 
+
                     } else {
-                        res.status(400).json(`Intervalo entre data emitidade e de expiracao: ${verifyDateidentityCard}`)
+                        res.status(400).json(`Estado civil invalido ${maritalstatus}`)
                     }
 
                 } else {
-                    res.status(400).json(`${issuedon} != ${validuntil}`)
+                    res.status(400).json(`Intervalo entre data emitidade e de expiracao: ${verifyDateidentityCard}`)
                 }
 
             } else {
-                res.status(400).json(`${email} email não existe...`)
+                res.status(400).json(`${issuedon} != ${validuntil}`)
             }
 
         } else {
-            res.status(400).json(`Id ${id} invalido...`)
+            res.status(400).json(`${email} email não existe...`)
         }
-
-
-
-
-
 
 
     }
@@ -199,13 +186,13 @@ export default class IdentityCardRepository {
 
         const { cardnumber, id } = identity
 
-        const verifyCardNumberId = await prisma.identityCard.findUnique({
+        const verifyCardNumberId = await prisma.user.findUnique({
             where: {
                 id: id
             }
         })
 
-        const verifyCardNumber = await prisma.identityCard.findUnique({
+        const verifyCardNumber = await prisma.user.findUnique({
             where: {
                 cardnumber: cardnumber
             }
@@ -218,7 +205,7 @@ export default class IdentityCardRepository {
                 res.status(400).json(`O numero de indetificacao desse bilhete ja esta sendo usado ${cardnumber}`)
             } else {
 
-                const response = await prisma.identityCard.update({
+                const response = await prisma.user.update({
                     where: {
                         id: id
                     },
@@ -258,11 +245,37 @@ export default class IdentityCardRepository {
 
         if (verifyUser?.email === email) {
 
-            const response = await prisma.identityCard.findMany({
+            const response = await prisma.user.findMany({
                 where: {
-                    user: {
-                        email: ""
-                    }
+                    email: email
+                },
+                select:{
+                    id: true,
+                    cardnumber: true,
+                    datebirth: true,
+                    email: true,
+                    fathername: true,
+                    fingerprint:true,
+                    height: true,
+                    issuedon: true,
+                    maritalstatus: true,
+                    mathername: true,
+                    name: true,
+                    naturalfrom: true,
+                    Phone: {
+                        select: {
+                            id: true,
+                            phone1: true,
+                            phone2: true
+                        }
+                    },
+                    province: true,
+                    sexo: true,
+                    username: true,
+                    validuntil: true,
+                    residence: true,
+                    password: false,
+    
                 }
             })
                 .then(async success => {

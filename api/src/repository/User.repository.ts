@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import UserDto from "../dto/User.dto";
 import { prisma } from "../../prisma/prisma";
 import Passowrd from "../utils/services/Password";
-import { SchemaUserLogin, TSchemaUserLogin } from "../validation/user.validation";
 import Jwt from "../utils/services/Jwt";
+import { User } from "@prisma/client";
+import { PasswordDto } from "../dto/Password.dto";
 
 
 export default class UserRepository extends Passowrd {
@@ -22,19 +23,30 @@ export default class UserRepository extends Passowrd {
             }
         })
 
+
         if (verifyEmail?.email === email) {
 
-            const passwordcorrect = await super.ComparePassword(password, verifyEmail.password)
+            const dbpassword = verifyEmail.password
 
-            if (passwordcorrect === true) {
-
-                const logged = new Jwt().token_sign(verifyEmail.id)
-
-                res.status(200).json(logged)
-
+            if (dbpassword === null) {
+                res.status(400).json(`Db password${dbpassword}`)
             } else {
-                res.status(400).json(`A sua palavra passe está incorreta.`)
+
+                const passwordcorrect = await super.ComparePassword(password, dbpassword)
+
+                if (passwordcorrect === true) {
+
+                    const logged = new Jwt().token_sign(verifyEmail.id)
+
+                    res.status(200).json(logged)
+
+                } else {
+                    res.status(400).json(`A sua palavra passe está incorreta.`)
+                }
+
             }
+
+
 
         } else {
             res.status(400).json(`Email ${email} invalido`)
@@ -53,106 +65,130 @@ export default class UserRepository extends Passowrd {
             }
         })
 
-        if (verifyEmail?.email === email) {
-            res.status(400).json(`Já existe um utilizador usando esse ${email} na aplicação.`)
+
+
+        if (verifyEmail?.created === true) {
+            res.status(400).json(`Só podes ter um bilhete na aplicação`)
         } else {
 
-            super.VerifyLevel(password)
-                .then(async successLevel => {
+            if (verifyEmail?.email === email) {
+                res.status(400).json(`Já existe um utilizador usando esse ${email} na aplicação.`)
+            } else {
 
-                    if (successLevel >= 0 && successLevel <= 2) {
-                        res.status(400).json(`Password ${password} é muito insegura`)
-                    } else {
+                super.VerifyLevel(password)
+                    .then(async successLevel => {
 
-                        const response = await prisma.user.create({
-                            data: {
-                                username: username,
-                                email: email,
-                                password: await super.Encrypt(password),
-                                Phone: {
-                                    create: {
-                                        phone1: phone1,
-                                        phone2: phone2
+                        if (successLevel >= 0 && successLevel <= 2) {
+                            res.status(400).json(`Password ${password} é muito insegura`)
+                        } else {
+
+                            const response = await prisma.user.create({
+                                data: {
+                                    username: username,
+                                    email: email,
+                                    password: await super.Encrypt(password),
+                                    Phone: {
+                                        create: {
+                                            phone1: phone1,
+                                            phone2: phone2
+                                        }
+                                    }
+                                },
+                                select: {
+                                    id: false,
+                                    email: true,
+                                    password: false,
+                                    username: true,
+                                    Phone: {
+                                        select: {
+                                            phone1: true,
+                                            phone2: true
+                                        }
                                     }
                                 }
-                            },
-                            select: {
-                                id: false,
-                                email: true,
-                                password: false,
-                                username: true,
-                                Phone: {
-                                    select: {
-                                        phone1: true,
-                                        phone2: true
-                                    }
-                                }
-                            }
-                        })
-                            .then(async success => {
-                                res.status(201).json("Conta criada")
                             })
-                            .catch(async error => {
-                                res.status(400).json(error)
-                            })
+                                .then(async success => {
+                                    res.status(201).json("Conta criada")
+                                })
+                                .catch(async error => {
+                                    res.status(400).json(error)
+                                })
 
-                    }
+                        }
 
-                })
+                    })
+
+            }
 
         }
 
+
+
     }
 
-    protected async updateUserBasic(req: Request, res: Response, user: Pick<UserDto, "id" | "password" | "username">) {
+    protected async updateUserBasic(req: Request, res: Response, user: Omit<UserDto, "id" | "password">) {
 
-        const { id, password, username } = user
+        const { email, idPhone, phone1, phone2, username } = user
 
         const verifyUser = await prisma.user.findUnique({
             where: {
-                id: id
+                email: email
             }
         })
 
-        if (verifyUser?.id === id) {
+        const verifyPhone = await prisma.phone.findUnique({
+            where: {
+                id: idPhone
+            }
+        })
 
+        if (verifyUser?.email === email) {
 
+            if (verifyPhone?.id === idPhone) {
 
-            super.VerifyLevel(password)
-                .then(async successLevel => {
-
-                    if (successLevel >= 0 && successLevel <= 2) {
-                        res.status(400).json(`Password ${password} é muito insegura`)
-                    } else {
-
-                        const response = await prisma.user.update({
-                            where: {
-                                id: id
-                            },
-                            data: {
-                                username: username,
-                                password: await super.Encrypt(password)
-                            },
-                            select: {
-                                id: false,
-                                email: true,
-                                password: false,
-                                username: true
+                const response = await prisma.user.update({
+                    where: {
+                        email: email
+                    },
+                    data: {
+                        username: username,
+                        password: verifyUser.password,
+                        Phone: {
+                            update: {
+                                where: {
+                                    id: idPhone,
+                                },
+                                data: {
+                                    phone1: phone1,
+                                    phone2: phone2
+                                }
                             }
-                        })
-                            .then(async success => {
-                                res.status(201).json(success)
-                            })
-                            .catch(async error => {
-                                res.status(400).json(error)
-                            })
-
+                        }
+                    },
+                    select: {
+                        id: false,
+                        email: true,
+                        password: false,
+                        username: true
                     }
-
                 })
+                    .then(async success => {
+                        res.status(201).json("Informações atualizadas")
+                    })
+                    .catch(async error => {
+                        res.status(400).json(error)
+                    })
+
+
+            } else {
+                res.status(400).json(`O id ${idPhone} esta invlaido`)
+
+            }
+
+
 
         } else {
-            res.status(400).json(`O id usuario está ${id} não existe...`)
+            res.status(400).json(`O id usuario está ${email} não existe...`)
         }
 
     }
@@ -177,11 +213,6 @@ export default class UserRepository extends Passowrd {
                 },
                 data: {
                     email: email
-                },
-                select: {
-                    id: false,
-                    username: true,
-                    email: true
                 }
             })
                 .then(async success => {
@@ -198,57 +229,70 @@ export default class UserRepository extends Passowrd {
 
     }
 
-    protected async updatePhoneUser(req: Request, res: Response, user: Pick<UserDto, "id" | "phone1" | "phone2" | "idPhone">) {
+    protected async UpdatePasswordUser(req: Request, res: Response, user: PasswordDto) {
 
-        const { id, phone1, phone2, idPhone } = user
+        const { email, passwordactually, oldpassword } = user
 
 
         const verifyUser = await prisma.user.findUnique({
             where: {
-                id: id
+                email: email
             }
         })
 
-        const verifyPhone = await prisma.phone.findUnique({
-            where: {
-                id: idPhone
-            }
-        })
+        if (verifyUser?.email === email) {
 
-        if (verifyUser?.id === id) {
+            const dbpassword = verifyUser?.password
 
-            if (verifyPhone?.id === idPhone) {
-
-
-                const response = await prisma.phone.update({
-                    where: {
-                        id: idPhone,
-                        userId: id
-                    },
-                    data: {
-                        phone1: phone1,
-                        phone2: phone2
-                    },
-                    select: {
-                        id: false,
-                        phone1: true,
-                        phone2: true
-                    }
-                })
-                    .then(async success => {
-                        res.status(200).json(success)
-                    })
-                    .catch(async error => {
-                        res.status(400).json(error)
-                    })
-
-
+            if (dbpassword === null) {
+                res.status(400).json(`Db password${dbpassword}`)
             } else {
-                res.status(400).json(`O id do phone está inválido ${idPhone}`)
+
+
+                const verifypassword = await super.ComparePassword(oldpassword, dbpassword)
+
+                console.log(verifypassword)
+
+                if (verifypassword === true) {
+
+
+                    super.VerifyLevel(passwordactually)
+                        .then(async successLevel => {
+
+                            if (successLevel >= 0 && successLevel <= 2) {
+                                res.status(400).json(`Password ${passwordactually} é muito insegura`)
+                            } else {
+
+                                const response = await prisma.user.update({
+                                    where: {
+                                        email: email,
+                                    },
+                                    data: {
+                                        password: await super.Encrypt(passwordactually)
+                                    }
+                                })
+                                    .then(async success => {
+                                        res.status(200).json("Password updated")
+                                    })
+                                    .catch(async error => {
+                                        res.status(400).json(error)
+                                    })
+
+                            }
+
+                        })
+
+
+
+                } else {
+                    res.status(400).json(`A sua palavra passe está incorreta.`)
+                }
+
             }
+
 
         } else {
-            res.status(400).json(`O id do usuario está inválido ${id}`)
+            res.status(400).json(`O email do usuario está inválido ${email}`)
         }
 
     }
@@ -257,14 +301,16 @@ export default class UserRepository extends Passowrd {
 
     }
 
-    protected async findAllUser(req: Request, res: Response) {
+    protected async findUniqueUser(req: Request, res: Response, date: Pick<User, "email">) {
 
-        const response = await prisma.user.findMany({
-            select: {
-                email: true,
-                username: true
+        const { email } = date
+
+        const response = await prisma.user.findUnique({
+            where: {
+                email: String(email)
             }
         })
+
         return res.status(200).json(response)
 
     }

@@ -8,26 +8,27 @@ datasource db {
 }
 
 model User {
-  id       String @unique @default(uuid())
-  username String
-  email    String @unique
-  password String
+  id       String  @unique @default(uuid())
+  username String?
+  email    String? @unique
+  password String?
 
-  cardnumber    String        @unique
-  name          String
-  fathername    String
-  mathername    String
-  residence     String
-  naturalfrom   String
-  province      String
-  datebirth     DateTime
-  sexo          Sexo
-  height        Float
-  maritalstatus MaritalStatus
-  issuedon      DateTime
-  validuntil    DateTime
+  cardnumber    String?        @unique
+  name          String?
+  fathername    String?
+  mathername    String?
+  residence     String?
+  naturalfrom   String?
+  province      String?
+  datebirth     DateTime?
+  sexo          Sexo?
+  height        Float?
+  maritalstatus MaritalStatus?
+  issuedon      DateTime?
+  validuntil    DateTime?
+  created       Boolean        @default(false)
 
-  fingerprint String @unique
+  fingerprint String? @unique
 
   create_at DateTime @default(now())
   update_at DateTime @updatedAt()

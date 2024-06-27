@@ -19,11 +19,11 @@ export default class IdentityCardRoutes extends IdentityCardController {
         const permission = await new PermissionRoutes().permission("user")
 
         this.identityCardRoutes
-            .post("/", permission, super.createIdentityCard)
-            .patch("/:id", permission, super.updateIdentityCard)
+            .patch("/", permission, super.createIdentityCard)
+            .patch("/update", permission, super.updateIdentityCard)
             .patch("/cardenumber/:id", permission, super.updateCardnumber)
             .get("/:email", permission, super.getIndentity)
-            
+
 
 
     }

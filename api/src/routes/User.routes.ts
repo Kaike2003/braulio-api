@@ -19,10 +19,10 @@ export default class UserRoutes extends UserController {
         this.userRoutes
             .post("/", super.create)
             .post("/login", super.login)
-            .patch("/:id", permission, super.updateBasic)
-            .patch("/email/:id", permission, super.updateEmail)
-            .patch("/phone/:id/:idPhone", permission, super.updatePhone)
-            .get("/", super.findAll)
+            .patch("/:email/:idPhone", permission, super.updateBasic)
+            .put("/email/:id", permission, super.updateEmail)
+            .put("/password/:email", permission, super.updatePassword)
+            .get("/", super.findUnique)
     }
 
 }

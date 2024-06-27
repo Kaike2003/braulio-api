@@ -22,16 +22,29 @@ const SchemaUser = z.object({
         .max(40),
 })
 
+const SchemaPassword = z.object({
+    email: z.string()
+        .email(),
+    passwordactually: z.string()
+        .min(3)
+        .max(35),
+    oldpassword: z.string()
+        .min(4)
+        .max(35),
+})
+
+export const SchemaPasswordUpdate = SchemaPassword
 
 export const SchemaUserCreate = SchemaUser.omit({ id: true, idPhone: true })
 export const SchemaUserDelete = SchemaUser.pick({ email: true })
-export const SchemaUserUpdateBasic = SchemaUser.omit({ email: true, phone1: true, phone2: true, idPhone: true })
+export const SchemaUserUpdateBasic = SchemaUser.omit({ id: true, password: true })
 export const SchemaUserUpdateEmail = SchemaUser.pick({ id: true, email: true })
 export const SchemaUserFindUnique = SchemaUser.pick({ email: true })
 export const SchemaUserLogin = SchemaUser.pick({ email: true, password: true })
 export const SchemaUserPhoneUpdate = SchemaUser.pick({ id: true, phone1: true, phone2: true, idPhone: true })
 
 
+export type TSchemaPasswordUpdate = z.infer<typeof SchemaPassword>
 export type TSchemaUserCreate = z.infer<typeof SchemaUserCreate>
 export type TSchemaUserDelete = z.infer<typeof SchemaUserDelete>
 export type TSchemaUserUpdateEmail = z.infer<typeof SchemaUserUpdateEmail>

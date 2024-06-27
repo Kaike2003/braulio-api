@@ -9,7 +9,7 @@ export default class FingerPrintRepository {
 
         const { id, email } = data
 
-        const verifyFingerPrint = await prisma.fingerprint.findUnique({
+        const verifyFingerPrint = await prisma.user.findUnique({
             where: {
                 id: id,
             }
@@ -18,14 +18,9 @@ export default class FingerPrintRepository {
         if (verifyFingerPrint?.id === id) {
             res.status(400).json("já existem um impressão digital nessa posição")
         } else {
-            const response = await prisma.fingerprint.create({
+            const response = await prisma.user.create({
                 data: {
-                    id: id,
-                    user: {
-                        connect: {
-                            email: email
-                        }
-                    }
+                    fingerprint: id,
                 }
             })
                 .then(async success => {
@@ -43,9 +38,9 @@ export default class FingerPrintRepository {
 
         const { id } = data
 
-        const verify = await prisma.fingerprint.findUnique({
+        const verify = await prisma.user.findUnique({
             where: {
-                id: id
+                fingerprint: id
             }
         })
 
@@ -53,37 +48,18 @@ export default class FingerPrintRepository {
 
             const verifyUser = await prisma.user.findUnique({
                 where: {
-                    id: verify.userId,
+                    id: verify.id,
                 },
                 select: {
                     email: true,
                     username: true,
                     Phone: {
                         where: {
-                            userId: verify.userId
+                            userId: verify.id
                         },
                         select: {
                             phone1: true,
                             phone2: true
-                        }
-                    },
-                    IdentityCard: {
-                        where:{
-                            userId: verify.userId,
-                        },
-                        select:{
-                            cardnumber: true,
-                            datebirth: true,
-                            fathername: true,
-                            height: true,
-                            issuedon: true,
-                            maritalstatus: true,
-                            mathername: true,
-                            name: true,
-                            naturalfrom: true,
-                            province: true,
-                            residence: true,
-                            sexo: true
                         }
                     }
                 }

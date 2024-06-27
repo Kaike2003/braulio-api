@@ -1,0 +1,18 @@
+-- AlterTable
+ALTER TABLE `users` MODIFY `username` VARCHAR(191) NULL,
+    MODIFY `email` VARCHAR(191) NULL,
+    MODIFY `password` VARCHAR(191) NULL,
+    MODIFY `cardnumber` VARCHAR(191) NULL,
+    MODIFY `datebirth` DATETIME(3) NULL,
+    MODIFY `fathername` VARCHAR(191) NULL,
+    MODIFY `fingerprint` VARCHAR(191) NULL,
+    MODIFY `height` DOUBLE NULL,
+    MODIFY `issuedon` DATETIME(3) NULL,
+    MODIFY `maritalstatus` ENUM('single', 'married', 'widower', 'divorced', 'separate') NULL,
+    MODIFY `mathername` VARCHAR(191) NULL,
+    MODIFY `name` VARCHAR(191) NULL,
+    MODIFY `naturalfrom` VARCHAR(191) NULL,
+    MODIFY `province` VARCHAR(191) NULL,
+    MODIFY `residence` VARCHAR(191) NULL,
+    MODIFY `sexo` ENUM('masculine', 'feminino') NULL,
+    MODIFY `validuntil` DATETIME(3) NULL;
